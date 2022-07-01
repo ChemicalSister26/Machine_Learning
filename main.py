@@ -1,24 +1,53 @@
+
 import torch
-import numpy as np
-import math
+from torch.utils.data import Dataset, DataLoader
+from torchvision import datasets
+from torchvision.transforms import ToTensor, Lambda
+import matplotlib.pyplot as plt
 
-data = [[1, 2], [3, 4]]
-a = torch.tensor(data)
-np = np.array(data)
-print(np)
+training_data = datasets.FashionMNIST(
+    root='data',
+    train=True,
+    download=True,
+    transform=ToTensor(),
+)
 
-b = torch.from_numpy(np)
-print(b)
+test_data = datasets.FashionMNIST(
+    root='data',
+    train=False,
+    download=True,
+    transform=ToTensor(),
+)
 
-c = torch.ones_like(a)
-print(c)
-d = torch.rand_like(a, dtype=torch.float)
-print(d)
+labels_map = {
+    0: "T-Shirt",
+    1: "Trouser",
+    2: "Pullover",
+    3: "Dress",
+    4: "Coat",
+    5: "Sandal",
+    6: "Shirt",
+    7: "Sneaker",
+    8: "Bag",
+    9: "Ankle Boot",
+}
 
-shape = (2, 3,)
+figure = plt.figure(figsize=(8, 8))
+cols, rows = 5, 5
+for i in range(1, cols * rows + 1):
+    index = torch.randint(len(training_data), size=(1,)).item()
+    img, label = training_data[index]
+    figure.add_subplot(rows, cols, i)
+    plt.title(labels_map[label])
+    plt.axis("off")
+    plt.imshow(img.squeeze(), cmap="gray")
+plt.show()
 
-s = torch.rand(shape)
-e = torch.ones(shape)
-f = torch.zeros(shape)
+train_dataloader = DataLoader(training_data, batch_size=64, shuffle=True)
+test_dataloader = DataLoader(test_data, batch_size=64, shuffle=True)
+train_features, train_labels = next(iter(train_dataloader))
+img = train_features[0].squeeze()
+label = train_labels[0]
+plt.imshow(img, cmap="gray")
+plt.show()
 
-print(s, e, f)
