@@ -1,53 +1,50 @@
-
+import os
 import torch
+
+from torch import nn
 from torch.utils.data import Dataset, DataLoader
-from torchvision import datasets
+from torchvision import datasets, transforms
 from torchvision.transforms import ToTensor, Lambda
 import matplotlib.pyplot as plt
 
-training_data = datasets.FashionMNIST(
-    root='data',
-    train=True,
-    download=True,
-    transform=ToTensor(),
-)
+import numpy as np
+X = np.array([1, 2, 3, 4], dtype=np.float32)
+Y = np.array([2, 4, 6, 8], dtype=np.float32)
 
-test_data = datasets.FashionMNIST(
-    root='data',
-    train=False,
-    download=True,
-    transform=ToTensor(),
-)
+w = 0.0
+#forward pass
+def forward(x):
+    return w*x
 
-labels_map = {
-    0: "T-Shirt",
-    1: "Trouser",
-    2: "Pullover",
-    3: "Dress",
-    4: "Coat",
-    5: "Sandal",
-    6: "Shirt",
-    7: "Sneaker",
-    8: "Bag",
-    9: "Ankle Boot",
-}
+#loss
+def loss(y, y_pred):
+  return(((y_pred-y)**2).mean())
 
-figure = plt.figure(figsize=(8, 8))
-cols, rows = 5, 5
-for i in range(1, cols * rows + 1):
-    index = torch.randint(len(training_data), size=(1,)).item()
-    img, label = training_data[index]
-    figure.add_subplot(rows, cols, i)
-    plt.title(labels_map[label])
-    plt.axis("off")
-    plt.imshow(img.squeeze(), cmap="gray")
-plt.show()
+#gradient
+def grad(x,y,y_pred):
+    return np.dot(2*x, y_pred-y).mean()
 
-train_dataloader = DataLoader(training_data, batch_size=64, shuffle=True)
-test_dataloader = DataLoader(test_data, batch_size=64, shuffle=True)
-train_features, train_labels = next(iter(train_dataloader))
-img = train_features[0].squeeze()
-label = train_labels[0]
-plt.imshow(img, cmap="gray")
-plt.show()
+print(f'Prediction before training {forward(5)}')
+
+#training
+
+learning_rate = 0.01
+epoch_number = 20
+
+for epoch in range(epoch_number):
+    #forward calculations
+    y_prediction = forward(X)
+    #loss
+    l = loss(Y, y_prediction)
+
+    #gradients
+    dw = grad(X, Y, y_prediction)
+
+    #update weights
+    w -= learning_rate*dw
+
+    if epoch % 1 == 0:
+        print(f'weight {w:3f}, loss {l:.8f}')
+
+print(f'Prediction after training {forward(5)}')
 
