@@ -1,7 +1,7 @@
 import os
 import torch
+import torch.nn as nn
 
-from torch import nn
 from torch.utils.data import Dataset, DataLoader
 from torchvision import datasets, transforms
 from torchvision.transforms import ToTensor, Lambda
@@ -48,27 +48,44 @@ import matplotlib.pyplot as plt
 #
 # print(f'Prediction after training {forward(5)}')
 
-X = torch.tensor([1, 2, 3, 4], dtype=torch.float32)
-Y = torch.tensor([2, 4, 6, 8], dtype=torch.float32)
 
-w = torch.tensor(0.0, dtype=torch.float32, requires_grad=True)
-#forward pass
-def forward(x):
-     return w*x
-#loss
-def loss(y, y_pred):
-   return(((y_pred-y)**2).mean())
+X = torch.tensor([[1], [2], [3], [4]], dtype=torch.float32)
+Y = torch.tensor([[2], [4], [6], [8]], dtype=torch.float32)
 
-print(f'Prediction before training {forward(5)}')
+X_test = torch.tensor([5], dtype=torch.float32)
+
+number_samples, number_features = X.shape
+input_size = number_features
+output_size = number_features
+
+
+
+class LinearRegression(nn.Module):
+    def __init__(self, input_dim, output_dim):
+        super(LinearRegression, self).__init__()
+
+    #define layers
+        self.lin = nn.Linear(input_dim, output_dim)
+
+    def forward(self, x):
+        return self.lin(x)
+
+model = LinearRegression(input_size, output_size)
+
+
+print(f'Prediction before training {model(X_test).item()}')
 
 #training
 
 learning_rate = 0.01
 epoch_number = 1000
 
+loss = nn.MSELoss()
+optimizer = torch.optim.SGD(model.parameters(), lr=learning_rate)
+
 for epoch in range(epoch_number):
     #forward calculations
-    y_prediction = forward(X)
+    y_prediction = model(X)
     #loss
     l = loss(Y, y_prediction)
 
@@ -76,13 +93,13 @@ for epoch in range(epoch_number):
     l.backward()
 
     #update weights
-    with torch.no_grad():
-        w -= learning_rate*w.grad
+    optimizer.step()
 
     # zero gradients
-    w.grad.zero_()
+    optimizer.zero_grad()
 
     if epoch % 10 == 0:
-        print(f'weight {w:3f}, loss {l:.8f}')
+        [w, b] = model.parameters()
+        print(f'weight {w[0][0].item():3f}, loss {l:.8f}')
 
-print(f'Prediction after training {forward(5)}')
+print(f'Prediction after training {model(X_test).item()}')
