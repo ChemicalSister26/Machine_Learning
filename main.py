@@ -1,62 +1,49 @@
-import os
 import torch
-import torch.nn as nn
-
+import torchvision
 from torch.utils.data import Dataset, DataLoader
-from torchvision import datasets, transforms
-from torchvision.transforms import ToTensor, Lambda
-import matplotlib.pyplot as plt
-from sklearn import datasets
 import numpy as np
+import math
 
 
-#preparing data
-X_numpy, y_numpy = datasets.make_regression(n_samples=100, n_features=1, noise=20, random_state=1)
+class WineDataset(Dataset):
+    # data loader
+    def __init__(self):
+        xy = np.loadtxt('wine.csv', delimiter=',', dtype=np.float32, skiprows=1)
+        self.x = torch.from_numpy(xy[:, 1:])
+        self.y = torch.from_numpy(xy[:, [0]])
+        self.n_samples = xy.shape[0]
 
-x = torch.from_numpy(X_numpy.astype(np.float32))
-y = torch.from_numpy(y_numpy.astype(np.float32))
+    # dataset[index]
+    def __getitem__(self, index):
+        return self.x[index], self.y[index]
 
-y = y.view(y.shape[0], 1)
+    # len(dataset)
+    def __len__(self):
+        return self.n_samples
 
-number_samples, number_features = x.shape
+dataset = WineDataset()
 
-# create model
+# first_part = dataset[0]
+# features, labels = first_part
+# print(features)
+# print(labels)
 
-input_size = number_features
-output_size = 1
+dataloader = DataLoader(dataset=dataset, batch_size=4, shuffle=True)
+# it = iter(dataloader)
+# it1 = it.next()
+# features, labels = it1
+# print(features)
+# print(labels)
 
-model = nn.Linear(input_size, output_size)
+# training loop
 
-# loss and optimizer
-learning_rate = 0.01
-criteria = nn.MSELoss()
-optimizer = torch.optim.SGD(model.parameters(), lr=learning_rate)
+epochs = 2
+total_samples = len(dataset)
+number_of_iterations = math.ceil(total_samples/4)
 
-#traininhg loop
+for i in range(epochs):
+    for j, (input, labels) in enumerate(dataloader):
+        if i % 5 == 0:
+            print(i, j, input.shape)
 
-epoch_number = 100
-for epoch in range(epoch_number):
-    #forward calculations
-    y_prediction = model(x)
-    #loss
-    loss = criteria(y_prediction, y)
-
-    #gradients = backward pass dl/dw
-    loss.backward()
-
-    #update weights
-    optimizer.step()
-
-     # zero gradients
-    optimizer.zero_grad()
-
-
-if epoch % 10 == 0:
-    [w, b] = model.parameters()
-    print(f'loss {loss.item():.8f}')
-
-predicted = model(x).detach().numpy()
-plt.plot(x, y, 'ro')
-plt.plot(x, predicted, 'g')
-plt.show()
 
