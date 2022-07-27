@@ -37,7 +37,7 @@ samples, labels = examples.next()
 class NeuralHandwritten(nn.Module):
     def __init__(self, input_size, hidden_size, number_classes):
         super(NeuralHandwritten, self).__init__()
-        self.L1 = nn.Linear(input_size, hidden_size)
+        self.l1 = nn.Linear(input_size, hidden_size)
         self.func = nn.ReLU()
         self.l2 = nn.Linear(hidden_size, number_classes)
 
