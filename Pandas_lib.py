@@ -44,4 +44,33 @@ res3 = students_performance.query('writing_score > @variable')  # when comparing
 
 res4 = list(students_performance)
 res5 = students_performance.filter(like='9', axis=0)
-print(res5)
+
+res6 = students_performance.groupby('gender', as_index=False).aggregate({'reading_score': 'mean',
+                                                         'writing_score': 'mean'})
+
+#it is better to point arg as_index=Fals, it makes data more consistent
+
+res7 = students_performance.groupby(['gender', 'race/ethnicity'], as_index=False).aggregate({'reading_score': 'mean'})
+res8 = students_performance.sort_values(['gender', 'writing_score']).groupby('gender').head(10)
+dota_hero = pd.read_csv('dataset/dota_hero_stats.csv')
+
+
+# here I am founding the number of heroes with certain number of legs (groupby legs number)
+res9 = dota_hero.groupby('legs').aggregate({"legs": 'count'})
+
+#here I am looking for higher average earnings between two contributors
+earnings = pd.read_csv('dataset/accountancy.csv')
+res10 = earnings.groupby(['Executor', 'Type']).aggregate({'Salary': 'mean'})
+
+res11 = dota_hero.iloc[:, [1,6]]
+res12 = dota_hero.groupby(['attack_type', 'primary_attr']).aggregate({'primary_attr': 'count'})
+
+vodorosli = pd.read_csv('dataset/algae.csv')
+print(vodorosli)
+res13 = vodorosli.groupby('genus').aggregate({'sucrose': 'mean', 'alanin': 'mean', 'citrate': 'mean',
+                                               'glucose': 'mean', 'oleic_acid': 'mean'})
+
+
+
+
+
