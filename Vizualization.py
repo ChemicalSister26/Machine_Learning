@@ -20,7 +20,7 @@ students_perf = students_perf.rename(columns={
 
 res = pd.read_csv('dataset/iris.csv')
 
-sns.distplot(res['sepal width'])
+ax = sns.violinplot(res['petal length'])
 plt.show()
 
 
