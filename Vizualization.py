@@ -17,11 +17,11 @@ students_perf = students_perf.rename(columns={
 # sns.lmplot(x='math_score', y='reading_score', hue='gender', data=students_perf)
 # plt.show()
 
-
-res = pd.read_csv('dataset/iris.csv')
-
-ax = sns.violinplot(res['petal length'])
-plt.show()
+#
+# res = pd.read_csv('dataset/iris.csv')
+#
+# ax = sns.violinplot(res['petal length'])
+# plt.show()
 
 
 
